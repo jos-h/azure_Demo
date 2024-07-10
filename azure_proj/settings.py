@@ -20,7 +20,7 @@ SECRET_KEY = "django-insecure-#4s+u&g^=9wauju0*nze13t9_uegma*1_bj78v^rnkun=$vxf)
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.getenv("DEBUG", True)
 
-ALLOWED_HOSTS = [] if DEBUG else ["djangodemoaz.azurewebsites.net", "localhost"]
+ALLOWED_HOSTS = ["djangodemoaz.azurewebsites.net", "localhost", "127.0.0.1"]
 
 
 # Application definition
