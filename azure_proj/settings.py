@@ -21,7 +21,7 @@ SECRET_KEY = "django-insecure-#4s+u&g^=9wauju0*nze13t9_uegma*1_bj78v^rnkun=$vxf)
 DEBUG = os.getenv("DEBUG", True)
 
 ALLOWED_HOSTS = ["djangodemoaz.azurewebsites.net", "localhost", "127.0.0.1"]
-
+CSRF_TRUSTED_ORIGINS = ['https://djangodemoaz.azurewebsites.net']
 
 # Application definition
 
