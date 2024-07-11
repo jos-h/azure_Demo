@@ -3,6 +3,7 @@ import os
 from pathlib import Path
 
 import environ
+from azure.monitor.opentelemetry import configure_azure_monitor
 from azure.monitor.opentelemetry.exporter import AzureMonitorTraceExporter
 from opentelemetry import trace
 from opentelemetry.instrumentation.django import DjangoInstrumentor
@@ -159,17 +160,22 @@ LOGGING = {
 
 logging.config.dictConfig(LOGGING)
 
-# Set up the tracer provider
-trace.set_tracer_provider(
-    TracerProvider(resource=Resource.create({SERVICE_NAME: "app"}))
-)
-# Configure the Azure Monitor exporter
-exporter = AzureMonitorTraceExporter(
-    connection_string=os.getenv("APPLICATIONINSIGHTS_CONNECTION_STRING")
+configure_azure_monitor(
+    connection_string=os.getenv("APPLICATIONINSIGHTS_CONNECTION_STRING"),
+    enable_live_metrics=True
 )
 
-# Add the exporter to the tracer provider
-trace.get_tracer_provider().add_span_processor(BatchSpanProcessor(exporter))
+# # Set up the tracer provider
+# trace.set_tracer_provider(
+#     TracerProvider(resource=Resource.create({SERVICE_NAME: "app"}))
+# )
+# # Configure the Azure Monitor exporter
+# exporter = AzureMonitorTraceExporter(
+#     connection_string=os.getenv("APPLICATIONINSIGHTS_CONNECTION_STRING")
+# )
 
-# Instrument Django
-DjangoInstrumentor().instrument()
+# # Add the exporter to the tracer provider
+# trace.get_tracer_provider().add_span_processor(BatchSpanProcessor(exporter))
+
+# # Instrument Django
+# DjangoInstrumentor().instrument()
