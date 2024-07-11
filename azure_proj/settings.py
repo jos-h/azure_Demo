@@ -3,6 +3,12 @@ import os
 from pathlib import Path
 
 import environ
+from azure.monitor.opentelemetry.exporter import AzureMonitorTraceExporter
+from opentelemetry import trace
+from opentelemetry.instrumentation.django import DjangoInstrumentor
+from opentelemetry.sdk.resources import SERVICE_NAME, Resource
+from opentelemetry.sdk.trace import TracerProvider
+from opentelemetry.sdk.trace.export import BatchSpanProcessor
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -21,7 +27,7 @@ SECRET_KEY = "django-insecure-#4s+u&g^=9wauju0*nze13t9_uegma*1_bj78v^rnkun=$vxf)
 DEBUG = os.getenv("DEBUG", True)
 
 ALLOWED_HOSTS = ["djangodemoaz.azurewebsites.net", "localhost", "127.0.0.1"]
-CSRF_TRUSTED_ORIGINS = ['https://djangodemoaz.azurewebsites.net']
+CSRF_TRUSTED_ORIGINS = ["https://djangodemoaz.azurewebsites.net"]
 
 # Application definition
 
@@ -37,6 +43,7 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
+    "opentelemetry.instrumentation.django.middleware.otel_middleware._DjangoMiddleware",
     "django.middleware.security.SecurityMiddleware",
     "whitenoise.middleware.WhiteNoiseMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
@@ -126,14 +133,12 @@ STATIC_ROOT = BASE_DIR / "staticfiles"
 LOGGING = {
     "version": 1,
     "disable_existing_loggers": False,
-    'formatters': {
-        'verbose': {
-            'format': "[%(asctime)s] %(levelname)s [%(filename)s:%(lineno)s] %(message)s",
-            'datefmt': "%Y/%b/%d %H:%M:%S"
+    "formatters": {
+        "verbose": {
+            "format": "[%(asctime)s] %(levelname)s [%(filename)s:%(lineno)s] %(message)s",
+            "datefmt": "%Y/%b/%d %H:%M:%S",
         },
-        'simple': {
-            'format': '%(levelname)s %(message)s'
-        },
+        "simple": {"format": "%(levelname)s %(message)s"},
     },
     "handlers": {
         "azure": {
@@ -144,10 +149,27 @@ LOGGING = {
     "loggers": {
         "app.views": {
             "level": "DEBUG",
-            "handlers": ["azure",],
+            "handlers": [
+                "azure",
+            ],
             "propagate": False,
         }
     },
 }
 
 logging.config.dictConfig(LOGGING)
+
+# Set up the tracer provider
+trace.set_tracer_provider(
+    TracerProvider(resource=Resource.create({SERVICE_NAME: "app"}))
+)
+# Configure the Azure Monitor exporter
+exporter = AzureMonitorTraceExporter(
+    connection_string=os.getenv("APPLICATIONINSIGHTS_CONNECTION_STRING")
+)
+
+# Add the exporter to the tracer provider
+trace.get_tracer_provider().add_span_processor(BatchSpanProcessor(exporter))
+
+# Instrument Django
+DjangoInstrumentor().instrument()
