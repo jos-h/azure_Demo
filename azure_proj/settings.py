@@ -162,7 +162,7 @@ LOGGING = {
 logging.config.dictConfig(LOGGING)
 
 configure_azure_monitor(
-        connection_string=os.getenv("APPLICATIONINSIGHTS_CONNECTION_STRING"),
-        enable_live_metrics=True,
-    )
+    connection_string=os.getenv("APPLICATIONINSIGHTS_CONNECTION_STRING"),
+    enable_live_metrics=True,
+)
 DjangoInstrumentor().instrument()
