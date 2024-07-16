@@ -7,8 +7,7 @@ from rest_framework.viewsets import ModelViewSet
 
 from app.serializers import UserSerializer
 
-logger = logging.getLogger(__name__)
-
+logger = logging.getLogger("azure_logger")
 
 class UserViewSet(ModelViewSet):
     queryset = User.objects.all()

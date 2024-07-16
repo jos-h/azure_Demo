@@ -27,7 +27,12 @@ SECRET_KEY = "django-insecure-#4s+u&g^=9wauju0*nze13t9_uegma*1_bj78v^rnkun=$vxf)
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.getenv("DEBUG", True)
 
-ALLOWED_HOSTS = ["djangodemoaz.azurewebsites.net", "localhost", "127.0.0.1", "169.254.129.2"]
+ALLOWED_HOSTS = [
+    "djangodemoaz.azurewebsites.net",
+    "localhost",
+    "127.0.0.1",
+    "169.254.129.2",
+]
 CSRF_TRUSTED_ORIGINS = ["https://djangodemoaz.azurewebsites.net"]
 
 # Application definition
@@ -130,13 +135,17 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 STATIC_ROOT = BASE_DIR / "staticfiles"
 
+configure_azure_monitor(
+    connection_string=os.getenv("APPLICATIONINSIGHTS_CONNECTION_STRING"),
+    enable_live_metrics=True,
+)
 
 LOGGING = {
     "version": 1,
     "disable_existing_loggers": False,
     "formatters": {
         "verbose": {
-            "format": "[%(asctime)s] %(levelname)s [%(filename)s:%(lineno)s] %(message)s",
+            "format": "%(asctime)s : %(name)s : %(levelname)s - %(message)s",
             "datefmt": "%Y/%b/%d %H:%M:%S",
         },
         "simple": {"format": "%(levelname)s %(message)s"},
@@ -148,22 +157,19 @@ LOGGING = {
         }
     },
     "loggers": {
-        "app.views": {
-            "level": "DEBUG",
+        "azure_logger": {
+            "level": os.getenv("LOG_LEVEL", "info").upper(),
             "handlers": [
                 "azure",
             ],
             "propagate": False,
-        }
+        },
     },
 }
 
 logging.config.dictConfig(LOGGING)
 
-configure_azure_monitor(
-    connection_string=os.getenv("APPLICATIONINSIGHTS_CONNECTION_STRING"),
-    enable_live_metrics=True
-)
+
 
 # # Set up the tracer provider
 # trace.set_tracer_provider(
