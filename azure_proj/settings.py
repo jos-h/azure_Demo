@@ -3,13 +3,6 @@ import os
 from pathlib import Path
 
 import environ
-from azure.monitor.opentelemetry import configure_azure_monitor
-from azure.monitor.opentelemetry.exporter import AzureMonitorTraceExporter
-from opentelemetry import trace
-from opentelemetry.instrumentation.django import DjangoInstrumentor
-from opentelemetry.sdk.resources import SERVICE_NAME, Resource
-from opentelemetry.sdk.trace import TracerProvider
-from opentelemetry.sdk.trace.export import BatchSpanProcessor
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -49,7 +42,6 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
-    "opentelemetry.instrumentation.django.middleware.otel_middleware._DjangoMiddleware",
     "django.middleware.security.SecurityMiddleware",
     "whitenoise.middleware.WhiteNoiseMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
@@ -135,10 +127,6 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 STATIC_ROOT = BASE_DIR / "staticfiles"
 
-configure_azure_monitor(
-    connection_string=os.getenv("APPLICATIONINSIGHTS_CONNECTION_STRING"),
-    enable_live_metrics=True,
-)
 
 LOGGING = {
     "version": 1,
@@ -168,20 +156,3 @@ LOGGING = {
 }
 
 logging.config.dictConfig(LOGGING)
-
-
-
-# # Set up the tracer provider
-# trace.set_tracer_provider(
-#     TracerProvider(resource=Resource.create({SERVICE_NAME: "app"}))
-# )
-# # Configure the Azure Monitor exporter
-# exporter = AzureMonitorTraceExporter(
-#     connection_string=os.getenv("APPLICATIONINSIGHTS_CONNECTION_STRING")
-# )
-
-# # Add the exporter to the tracer provider
-# trace.get_tracer_provider().add_span_processor(BatchSpanProcessor(exporter))
-
-# # Instrument Django
-# DjangoInstrumentor().instrument()
