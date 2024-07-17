@@ -42,7 +42,7 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
-    "opentelemetry.instrumentation.django.middleware.otel_middleware._DjangoMiddleware",
+    # "opentelemetry.instrumentation.django.middleware.otel_middleware._DjangoMiddleware",
     "django.middleware.security.SecurityMiddleware",
     "whitenoise.middleware.WhiteNoiseMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
