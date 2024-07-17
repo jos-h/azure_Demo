@@ -10,36 +10,33 @@ An example to show an application using Opentelemetry tracing api and sdk. Custo
 tracked via spans and telemetry is exported to application insights with the AzureMonitorTraceExporter.
 """
 
-tracer = None
-def setup_tracing():
-    tracer_provider = TracerProvider()
-    trace.set_tracer_provider(tracer_provider)
-    tracer = trace.get_tracer(__name__)
-    try:
-        # This is the exporter that sends data to Application Insights
-        exporter = AzureMonitorTraceExporter(
-            connection_string=os.getenv("APPLICATIONINSIGHTS_CONNECTION_STRING")
-        )
-        span_processor = BatchSpanProcessor(exporter)
-        trace.get_tracer_provider().add_span_processor(span_processor)
-    except Exception as e:
-        print(f"Error setting up the trace:{str(e)}")
-
 
 class OpenTelemetryMiddleware:
     def __init__(self, get_response):
         self.get_response = get_response
+        tracer_provider = TracerProvider()
+        trace.set_tracer_provider(tracer_provider)
         self.tracer = trace.get_tracer(__name__)
+        span_processor = BatchSpanProcessor(
+            AzureMonitorTraceExporter(
+                connection_string=os.getenv("APPLICATIONINSIGHTS_CONNECTION_STRING")
+            )
+        )
+        tracer_provider.add_span_processor(span_processor)
 
     def __call__(self, request):
-        # Start a new span for this request
-        with self.tracer.start_as_current_span(
-            "django_request",
-            attributes={"http.method": request.method, "http.url": request.path_info},
-        ) as span:
-            response = self.get_response(request)
-            span.set_attribute("http.status_code", response.status_code)
-            return response
-
-
-setup_tracing()
+        try:
+            # Start a new span for this request
+            with self.tracer.start_as_current_span(
+                "django_request",
+                attributes={
+                    "http.method": request.method,
+                    "http.url": request.path_info,
+                },
+            ) as span:
+                response = self.get_response(request)
+                span.set_attribute("http.status_code", response.status_code)
+                return response
+        except Exception as e:
+            print(f"Error creating span in custom middleware:{str(e)}")
+            return self.get_response(request)
