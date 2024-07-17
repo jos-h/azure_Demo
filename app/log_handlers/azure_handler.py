@@ -8,6 +8,7 @@ from azure.core.exceptions import HttpResponseError
 from azure.identity import DefaultAzureCredential
 from azure.monitor.ingestion import LogsIngestionClient
 
+
 def get_client_credential():
     if os.getenv("LOGS_INGESTION_ENDPOINT") and os.getenv("USE_AZURE_LOG"):
         credential = DefaultAzureCredential()

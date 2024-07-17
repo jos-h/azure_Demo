@@ -3,9 +3,6 @@ import os
 from pathlib import Path
 
 import environ
-from azure.monitor.opentelemetry import configure_azure_monitor
-from opentelemetry import trace
-from opentelemetry.instrumentation.django import DjangoInstrumentor
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -160,9 +157,3 @@ LOGGING = {
 }
 
 logging.config.dictConfig(LOGGING)
-
-configure_azure_monitor(
-    connection_string=os.getenv("APPLICATIONINSIGHTS_CONNECTION_STRING"),
-    enable_live_metrics=True,
-)
-DjangoInstrumentor().instrument()

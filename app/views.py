@@ -9,6 +9,7 @@ from app.serializers import UserSerializer
 
 logger = logging.getLogger("azure_logger")
 
+
 class UserViewSet(ModelViewSet):
     queryset = User.objects.all()
     serializer_class = UserSerializer
