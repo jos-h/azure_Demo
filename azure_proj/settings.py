@@ -51,6 +51,7 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    "app.middleware.open_telemetry_middleware.OpenTelemetryMiddleware",
 ]
 
 ROOT_URLCONF = "azure_proj.urls"

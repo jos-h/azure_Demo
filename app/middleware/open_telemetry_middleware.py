@@ -10,10 +10,11 @@ An example to show an application using Opentelemetry tracing api and sdk. Custo
 tracked via spans and telemetry is exported to application insights with the AzureMonitorTraceExporter.
 """
 
-
+tracer = None
 def setup_tracing():
     tracer_provider = TracerProvider()
     trace.set_tracer_provider(tracer_provider)
+    tracer = trace.get_tracer(__name__)
     try:
         # This is the exporter that sends data to Application Insights
         exporter = AzureMonitorTraceExporter(
@@ -28,11 +29,11 @@ def setup_tracing():
 class OpenTelemetryMiddleware:
     def __init__(self, get_response):
         self.get_response = get_response
+        self.tracer = trace.get_tracer(__name__)
 
     def __call__(self, request):
-        tracer = trace.get_tracer(__name__)
         # Start a new span for this request
-        with tracer.start_as_current_span(
+        with self.tracer.start_as_current_span(
             "django_request",
             attributes={"http.method": request.method, "http.url": request.path_info},
         ) as span:
