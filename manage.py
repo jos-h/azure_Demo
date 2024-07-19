@@ -10,7 +10,10 @@ from opentelemetry.instrumentation.django import DjangoInstrumentor
 def main():
     """Run administrative tasks."""
     os.environ.setdefault("DJANGO_SETTINGS_MODULE", "azure_proj.settings")
+
+    # Enable instrumentation in the django library.
     DjangoInstrumentor().instrument()
+
     try:
         from django.core.management import execute_from_command_line
     except ImportError as exc:

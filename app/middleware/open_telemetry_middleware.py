@@ -1,39 +1,32 @@
 import os
-
+from azure.core.settings import settings
 from azure.monitor.opentelemetry.exporter import AzureMonitorTraceExporter
+from azure.monitor.opentelemetry import configure_azure_monitor
 from opentelemetry import trace
 from opentelemetry.sdk.trace import TracerProvider
-from opentelemetry.sdk.trace.export import BatchSpanProcessor
+from opentelemetry.sdk.trace.export import SimpleSpanProcessor
 
-"""
-An example to show an application using Opentelemetry tracing api and sdk. Custom dependencies are
-tracked via spans and telemetry is exported to application insights with the AzureMonitorTraceExporter.
-"""
-
+# Declare OpenTelemetry as enabled tracing plugin for Azure SDKs
+settings.tracing_implementation = "opentelemetry"
 
 class OpenTelemetryMiddleware:
     def __init__(self, get_response):
         self.get_response = get_response
-        tracer_provider = TracerProvider()
-        trace.set_tracer_provider(tracer_provider)
-        self.tracer = trace.get_tracer(__name__)
-        span_processor = BatchSpanProcessor(
-            AzureMonitorTraceExporter(
-                connection_string=os.getenv("APPLICATIONINSIGHTS_CONNECTION_STRING")
-            )
-        )
-        tracer_provider.add_span_processor(span_processor)
 
+        trace.set_tracer_provider(TracerProvider())
+        self.tracer = trace.get_tracer(__name__)
+        exporter = AzureMonitorTraceExporter(
+            connection_string=os.getenv("APPLICATIONINSIGHTS_CONNECTION_STRING")
+        )
+        trace.get_tracer_provider().add_span_processor(SimpleSpanProcessor(exporter))
+       
     def __call__(self, request):
         try:
             # Start a new span for this request
-            with self.tracer.start_as_current_span(
-                "django_request",
-                attributes={
-                    "http.method": request.method,
-                    "http.url": request.path_info,
-                },
-            ) as span:
+            with self.tracer.start_as_current_span(name="MyApp") as span:
+                print("Inside current_span context manager")
+                span.set_attribute("http.method", request.method)
+                span.set_attribute("http.url", request.path)
                 response = self.get_response(request)
                 span.set_attribute("http.status_code", response.status_code)
                 return response
