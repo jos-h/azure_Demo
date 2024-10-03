@@ -1,4 +1,4 @@
-# Python Django Azure LogAnalytics Workspace App
+# Django Application: Logging to Azure Log Analytics Workspace
 
 A simple app developed in Django, to capture the application logs and send the logs to Azure Log Analytics Workspace. Created a webapp in Azure and enabled Application Insights.
 Created Log Analytics Workspace in Azure Montior, setup the **Data Collection Endpoint** and **Data Collection Rules** with telemetry write permissions.
