@@ -1,5 +1,9 @@
 # Django Application: Logging to Azure Log Analytics Workspace
 
-A simple app developed in Django, to capture the application logs and send the logs to Azure Log Analytics Workspace. Created a webapp in Azure and enabled Application Insights.
-Created Log Analytics Workspace in Azure Montior, setup the **Data Collection Endpoint** and **Data Collection Rules** with telemetry write permissions.
-Using **azure-sdk-for-python** send the logs to Azure LogAnalytics Workspace. All these logs are being logged in the traces table. By running kusto query in the logs section in Query editor, made sure the logs are getting logged in traces table.
+This is a simple Django application designed to capture and send application logs to Azure Log Analytics Workspace.
+
+# Key Features:
+- **Azure Web App Integration**: Deployed to Azure as a web app with **Application Insights enabled**.
+- **Azure Log Analytics Workspace**: Set up in Azure Monitor, complete with a **Data Collection Endpoint (DCE)** and **Data Collection Rules (DCR)** configured for telemetry write permissions.
+- **Logging Mechanism**: Uses the ```azure-sdk-for-python``` to send logs to Azure Log Analytics. The logs are captured in the **Traces** table within the Log Analytics Workspace.
+- **Log Verification**: Logs are verified via **Kusto queries** in the Azure Logs Query Editor, ensuring they are logged correctly in the **Traces** table.
